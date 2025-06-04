@@ -11,7 +11,7 @@ M.render_single = function(renderopts)
   end
 
   if renderopts.bufname == "" then
-    return "[No Name]"
+    return " [No Name] "
   end
 
   local fullpath = vim.fn.fnamemodify(renderopts.bufname, ":p")
@@ -39,7 +39,7 @@ M.render_single = function(renderopts)
 
   local file = parts[#parts]
 
-  return ret .. file
+  return " " .. ret .. file .. " "
 end
 
 M.render = function()
