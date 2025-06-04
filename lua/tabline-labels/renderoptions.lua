@@ -8,6 +8,7 @@ local M = {}
 ---@field is_first boolean True if this is the first tab page (`tabpagenr() == 1`)
 ---@field is_last boolean True if this is the last tab page (`tabpagenr() == tabpagenr('$')`)
 ---@field is_current boolean True if this is the currently active tab page (`tabpagenr() == i`)
+---@field modified boolean True if there are modified buffers on the tab page
 
 ---Returns a list of RenderOptions for all tabs
 ---@return table<RenderOptions>
@@ -25,6 +26,14 @@ M.make_render_options_table = function()
     opts.is_first = i == 1
     opts.is_last = i == lastpagenr
     opts.is_current = i == vim.fn.tabpagenr()
+
+    opts.modified = false
+    for _, b in ipairs(opts.buflist) do
+      if vim.bo[b].modified then
+        opts.modified = true
+        break
+      end
+    end
 
     table.insert(ret, opts)
   end

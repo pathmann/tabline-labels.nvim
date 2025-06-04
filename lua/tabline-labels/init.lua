@@ -29,6 +29,10 @@ M.render_single = function(renderopts)
   end
 
   local ret = ""
+  if renderopts.modified then
+    ret = "+ "
+  end
+
   for i = 1, #parts - 1, 1 do
     if Config.options.should_shrink_section(i, #parts -1, renderopts) then
       ret = ret .. parts[i]:sub(1, 1) .. "/"
