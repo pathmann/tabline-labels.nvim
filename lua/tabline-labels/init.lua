@@ -41,7 +41,11 @@ M.render_single = function(renderopts)
     end
   end
 
-  local file = parts[#parts]
+  local file = parts[#parts] or ""
+
+  if ret == "" and file == "" then
+    return " [No Name] "
+  end
 
   return " " .. ret .. file .. " "
 end
