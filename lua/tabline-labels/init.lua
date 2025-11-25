@@ -57,15 +57,25 @@ M.render = function()
 
   local ret = ""
   local rendopts = RendOpts.make_render_options_table()
+  local slabel = ""
+  local maxwidth = Config.options.inactive_maxwidth
 
   for _, ropts in ipairs(rendopts) do
+    slabel = M.render_single(ropts)
+
     if ropts.is_current then
       ret = ret .. "%#TabLineSel#"
     else
       ret = ret .. "%#TabLine#"
+
+      if maxwidth ~= 0 then
+        if vim.fn.strdisplaywidth(slabel) > maxwidth then
+          slabel = slabel:sub(- maxwidth)
+        end
+      end
     end
 
-    ret = ret .. M.render_single(ropts)
+    ret = ret .. slabel
   end
 
   ret = ret .. "%#TabLineFill#"

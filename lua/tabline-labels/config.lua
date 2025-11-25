@@ -4,11 +4,13 @@ local M = {}
 ---@field render_full? fun(): string Full custom render function, if given all other options are ignored
 ---@field render? fun(RenderOptions): string Render a single tab
 ---@field remove_cwd boolean Remove the cwd part from the path
+---@field inactive_maxwidth number maximum width of inactive tabs, 0 to not shrink inactive tabs
 ---@field should_shrink_section? fun(index: number, total_sections: number, renderopts: RenderOptions): boolean  controls which sections of the file path should be shortened in the tab label (if remove_cwd is true, the cwd is removed before this is called)
 local defaults = {
   render_full = nil,
   render = nil,
   remove_cwd = true,
+  inactive_maxwidth = 0,
   should_shrink_section = function(index, total)
     return index ~= total
   end,

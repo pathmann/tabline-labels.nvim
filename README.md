@@ -34,6 +34,8 @@ Using [lazy.nvim](https://github.com/folke/lazy.nvim):
 require("tabline-labels").setup({
   remove_cwd = true,  -- Remove the current working directory prefix from paths
 
+  inactive_maxwidth = 0, -- Shrink labels of inactive tabs to this width, 0 to not shrink inactive tabs
+
   -- Customize which path sections get shrinked
   should_shrink_section = function(index, total)
     -- shrink all but the final path part 
