@@ -10,6 +10,10 @@ local M = {}
 ---@field is_current boolean True if this is the currently active tab page (`tabpagenr() == i`)
 ---@field modified boolean True if there are modified buffers on the tab page
 
+---@class RenderOptionsRendered: RenderOptions
+---@field rendered string
+---@field width number
+
 ---Returns a list of RenderOptions for all tabs
 ---@return RenderOptions[]
 M.make_render_options_table = function()

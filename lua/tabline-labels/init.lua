@@ -3,6 +3,133 @@ local M = {}
 local Config = require("tabline-labels.config")
 local RendOpts = require("tabline-labels.renderoptions")
 
+---Calculate which tabs to display according to the maximum size
+---@param renderopts RenderOptionsRendered[]
+---@param curtabid number the current tab index
+---@param maxwidth number the maximum width
+---@param policy string policy used to expand @see Config.expand_policy
+---@return number, number left and right index to include
+local function calculate_display_tabs(renderopts, curtabid, maxwidth, policy)
+  local used = renderopts[curtabid].width
+  local left = curtabid
+  local right = curtabid
+
+  if policy == "right-left" then
+    local expanded
+    local w
+
+    while true do
+      expanded = false
+
+      if right +1 <= #renderopts then
+        w = renderopts[right +1].width
+
+        if used + w < maxwidth then
+          used = used + w
+          right = right +1
+          expanded = true
+        end
+      end
+
+      if left -1 >= 1 then
+        w = renderopts[left -1].width
+
+        if used + w < maxwidth then
+          used = used + w
+          left = left -1
+          expanded = true
+        end
+      end
+
+      if not expanded then
+        break
+      end
+    end
+  elseif policy == "left" then
+    local w
+
+    for i = left -1, 1, -1 do
+      w = renderopts[i].width
+
+      if used + w < maxwidth then
+        used = used + w
+        left = i
+      else
+        break
+      end
+    end
+
+    for i = right +1, #renderopts, 1 do
+      w = renderopts[i].width
+
+      if used + w < maxwidth then
+        used = used + w
+        right = i
+      else
+        break
+      end
+    end
+  elseif policy == "right" then
+    local w
+
+    for i = right +1, #renderopts, 1 do
+      w = renderopts[i].width
+
+      if used + w < maxwidth then
+        used = used + w
+        right = i
+      else
+        break
+      end
+    end
+
+    for i = left -1, 1, -1 do
+      w = renderopts[i].width
+
+      if used + w < maxwidth then
+        used = used + w
+        left = i
+      else
+        break
+      end
+    end
+  else
+    -- left-right
+    local expanded
+    local w
+
+    while true do
+      expanded = false
+
+      if left -1 >= 1 then
+        w = renderopts[left -1].width
+
+        if used + w < maxwidth then
+          used = used + w
+          left = left -1
+          expanded = true
+        end
+      end
+
+      if right +1 <= #renderopts then
+        w = renderopts[right +1].width
+
+        if used + w < maxwidth then
+          used = used + w
+          right = right +1
+          expanded = true
+        end
+      end
+
+      if not expanded then
+        break
+      end
+    end
+  end
+
+  return left, right
+end
+
 ---Render a single tab label
 ---@param renderopts RenderOptions
 M.render_single = function(renderopts)
@@ -56,26 +183,47 @@ M.render = function()
   end
 
   local ret = ""
+  ---@type RenderOptionsRendered[]
   local rendopts = RendOpts.make_render_options_table()
-  local slabel = ""
-  local maxwidth = Config.options.inactive_maxwidth
+  local maxswidth = Config.options.inactive_maxwidth
+  local curid
+  local totalwidth = 0
 
-  for _, ropts in ipairs(rendopts) do
-    slabel = M.render_single(ropts)
+  for i, ropts in ipairs(rendopts) do
+    ropts.rendered = M.render_single(ropts)
+    ropts.width = vim.fn.strdisplaywidth(ropts.rendered)
 
     if ropts.is_current then
-      ret = ret .. "%#TabLineSel#"
+      curid = i
     else
-      ret = ret .. "%#TabLine#"
-
-      if maxwidth ~= 0 then
-        if vim.fn.strdisplaywidth(slabel) > maxwidth then
-          slabel = slabel:sub(- maxwidth)
+      if maxswidth ~= 0 then
+        if ropts.width > maxswidth then
+          ropts.rendered = ropts.rendered:sub(- maxswidth)
+          ropts.width = vim.fn.strdisplaywidth(ropts.rendered)
         end
       end
     end
 
-    ret = ret .. slabel
+    totalwidth = totalwidth + ropts.width
+  end
+
+  local winwidth = vim.api.nvim_get_option_value("columns", {})
+
+  local left = 1
+  local right = vim.fn.tabpagenr('$')
+
+  if totalwidth > winwidth then
+    left, right = calculate_display_tabs(rendopts, curid, winwidth, Config.options.expand_policy)
+  end
+
+  for i = left, right do
+    if rendopts[i].is_current then
+      ret = ret .. "%#TabLineSel#"
+    else
+      ret = ret .. "%#TabLine#"
+    end
+
+    ret = ret .. rendopts[i].rendered
   end
 
   ret = ret .. "%#TabLineFill#"

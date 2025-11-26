@@ -42,6 +42,13 @@ require("tabline-labels").setup({
     return index ~= total
   end,
 
+  -- how to expand if the width exceeds the maximum size: 
+  --    "left-right" adds an element left to the current, then one to the right until the sizes adds up
+  --    "right-left" adds an element right to the current, then one to the left, until the sizes adds up
+  --    "left" adds all elements to the left first
+  --    "right" adds all elements to the right first 
+  expand_policy = "right",
+
   -- Optional: override how each tab is rendered
   -- render = function(opts) return "..." end
 
