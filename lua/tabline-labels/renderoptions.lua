@@ -11,7 +11,7 @@ local M = {}
 ---@field modified boolean True if there are modified buffers on the tab page
 
 ---Returns a list of RenderOptions for all tabs
----@return table<RenderOptions>
+---@return RenderOptions[]
 M.make_render_options_table = function()
   local ret = {}
 
