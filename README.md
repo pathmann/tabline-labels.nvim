@@ -1,4 +1,12 @@
-# tabline-labels.nvim
+> **Notice**
+>
+> This project has been moved to a new location.
+>
+> **New repository:** https://codeberg.org/plusquam/tabline-labels.nvim
+>
+> This repository is no longer maintained. Please update your bookmarks and references.# tabline-labels.nvim
+
+---
 
 > 🏷️ A simple, customizable plugin to control how tab labels are displayed in Neovim's native tabline.
 
